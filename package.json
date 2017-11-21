@@ -1,0 +1,21 @@
+{
+  "name": "katbot",
+  "version": "1.0.0",
+  "description": "Bot for KatEvolved's Stream",
+  "main": "app.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "KatBot"
+  },
+  "keywords": [
+    "KatBot"
+  ],
+  "author": "Lucas Minter",
+  "license": "ISC",
+  "dependencies": {
+    "tmi.js": "^1.2.1"
+  }
+}
