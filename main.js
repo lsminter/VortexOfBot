@@ -37,36 +37,37 @@ var http = require('http');
 
 // VARIABLES FOR LATER USE
 var greetings = [
+        "Did you bring me my doughnut xMustang?",
         "Greetings earthling!",
         "Hi there!",
         "Wazzup bro",
         "Eyyyyyyyyy",
-        "Welcome to da club!",
-        "Welcome, Did you bring any beer?",
-        "Welcome to the dark side..."
+        "Welcome! Did you bring any beer?",
+        "Welcome to the dark side...",
     ],
     interMessagesCounter = 0,
     intervalMessages = [
-        "Welcome to my channel. If you like whatcha see, follow! You can access my youtube here: https://www.youtube.com/channel/UC4XryR0fHLOlwCO4KLvn-ow"
+        "If you like whatcha see, follow! You can access my youtube here: https://www.youtube.com/channel/UC4XryR0fHLOlwCO4KLvn-ow",
+        "Stalk me here! https://twitter.com/MyKatEvolved"
     ],
     emotes = [
         "Kappa",
         "KappaPride",
         "BrokeBack",
         "DansGame",
-        "Keygasm",
+        "Kreygasm",
         "SwiftRage",
         "BabyRage",
         "SMOrc",
         "FrankerZ",
         "4Head",
-        "Wutface",
+        "WutFace",
         "VoHiYo"
     ],
     welcometext =
-        "Welcome! chat messages should not be longer than 500 characters, and don't spam commands please. " +
-        "Here's a list of the available commands: ",
-    channelName = "b1tspls",
+        "Welcome! chat messages should not be longer than 500 characters. " +
+        "Here's a list of the available commands: !about, !hello, !saymyname, !dicefules, !roll, !points, !testsafe.",
+    channelName = "katevolved",
     commandCounter = 0,
     chatMaxLength = 500;
 
@@ -76,8 +77,7 @@ setInterval(function ()
     commandCounter = 0;
 }, 10000);
 
-// CREATE CLIENT OBJECT
-var client = new tmi.client({
+var options = {
     options: {
         debug: true
     },
@@ -87,21 +87,37 @@ var client = new tmi.client({
     },
     identity: {
         username: "KatEvoBot",
-        password: "oauth:jvnaulneic4rxrjuxv7t9b67d6e81x"
+        password: "oauth:vwohov7is1pou2rw9sylme9bra0z64"
     },
-    channels: ["minterhero"]
-});
+    channels: [
+    "katevolved",
+    "minterhero"
+    ]
+}
+
+// CREATE CLIENT OBJECT
+var client = new tmi.client(options);
 
 // COMMANDS OBJECT
 var Commands = {
     '!about': function (channel, user, message, self)
     {
-        client.action(channel, welcometext + commandList);
+        client.action(channel, welcometext);
     },
 
-    '!hello': function (channel, user, message, self)
+    '!bye': function (channel, user, message, self)
     {
-        client.action(channel, getRandomListItem(greetings));
+        client.action(channel, "Until next time " + user['display-name'] + "! " + getRandomListItem(emotes) );
+    },
+
+    '!rolltheminter': function (channel, user, message, self)
+    {
+        client.action(channel, user['display-name'] + " is the coolest person ever!");
+    },
+
+    '!hi': function (channel, user, message, self)
+    {
+        client.action(channel, getRandomListItem(greetings) + " " + getRandomListItem(emotes));
     },
 
     '!saymyname': function (channel, user, message, self)
@@ -111,22 +127,20 @@ var Commands = {
 
     '!dicerules': function (channel, user, message, self)
     {
-        client.action(channel, "The dice has 20 sides, if you roll a 1 you are timed out. " +
-            "Your scores are saved by the bot.")
+        client.action(channel, "The dice has 100 sides, if you roll a 1 you are timed out. Your scores are saved by the bot.")
     },
 
-    '!rollthedice': function (channel, user, message, self)
+    '!roll': function (channel, user, message, self)
     {
-        var diceResult = String(Math.floor(Math.random() * 20) + 1);
+        var diceResult = String(Math.floor(Math.random() * 1) + 1);
         client.action(channel, user['display-name'] + ", you rolled " + diceResult + "!");
         if (diceResult === 1)
         {
-            client.timeout(channel, user['display-name'], 300, "Oh no, you rolled a 1! BibleThump");
+            client.timeout(channel, user['display-name'], 300, "Oh no, you rolled a 1! BibleThump")
         }
         fs.appendFile('rollthediceStats.txt', user['display-name'] + " rolled " + diceResult + "\n");
     },
-
-    '!dicestats': function (channel, user, message, self)
+    '!points': function (channel, user, message, self)
     {
         var userStats, score = 0;
         fs.readFile('rollthediceStats.txt', 'utf-8', function (err, data)
@@ -147,16 +161,20 @@ var Commands = {
 
     '!testsafe': function (channel, user, message, self)
     {
-        if (user['display-name'] === "minterhero")
+        if (user['display-name'] === "minterhero" || "KatEvolved")
         {
             client.action(channel, "Bot is working!")
         }
         else
         {
-            client.action(channel, "This command is for the admin only");
+            client.action(channel, "This command is for the admin only.");
         }
     }
 };
+
+client.on("resub", function (channel, username, months, message) {
+    client.action('Thank you ' + username + ' for subscribing! katevoKat')
+});
 
 // LIST COMMAND KEYS
 var commandList = Object.keys(Commands);
@@ -184,14 +202,6 @@ client.on("chat", function (channel, user, message, self)
         if (Commands.hasOwnProperty(parsedCommand))
         {
             // check if commands are sent too fast (counter starts at 0)
-            if (commandCounter === 2)
-            {
-                client.whisper(user['display-name'], "Last warning: you are sending commands too fast!");
-            }
-            else (commandCounter >= 4)
-            {
-                client.timeout(channel, user['display-name'], 60, "spamming commands")
-            }
 
             // execute command
             Commands[parsedCommand](channel, user, message, self);
@@ -208,7 +218,11 @@ setInterval(function() {
     } else {
         interMessagesCounter = 0;
     }
-}, 360000);
+}, 600000);
 
 // CONNECT BOT
 client.connect();
+
+client.on("connected", function(address, port) {
+    client.action("minterhero", "Bot connected!")
+})
