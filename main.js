@@ -132,7 +132,7 @@ var Commands = {
 
     '!roll': function (channel, user, message, self)
     {
-        var diceResult = String(Math.floor(Math.random() * 1) + 1);
+        var diceResult = String(Math.floor(Math.random() * 100) + 1);
         client.action(channel, user['display-name'] + ", you rolled " + diceResult + "!");
         if (diceResult === 1)
         {
@@ -173,7 +173,10 @@ var Commands = {
 };
 
 client.on("resub", function (channel, username, months, message) {
-    client.action('Thank you ' + username + ' for subscribing! katevoKat')
+    client.action('Thank you ' + username + ' for subscribing!')
+});
+client.on("subscribers", function (channel, enabled) {
+    client.action('Thank you ' + username + ' for subscribing!')
 });
 
 // LIST COMMAND KEYS
@@ -224,5 +227,5 @@ setInterval(function() {
 client.connect();
 
 client.on("connected", function(address, port) {
-    client.action("minterhero", "Bot connected!")
+    client.action("KatEvolved", "Bot connected!")
 })
