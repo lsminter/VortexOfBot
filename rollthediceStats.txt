@@ -215,3 +215,4 @@ vortex_of_blades rolled 10000000
 king_arthur02 rolled 54
 king_arthur02 rolled 85
 minterhero rolled 40
+Test rolled 30
