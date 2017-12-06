@@ -38,3 +38,6 @@ client.on("chat", function (channel, user, message, self)
         }
     }
 });
+
+KatEvoBot: password: "oauth:vwohov7is1pou2rw9sylme9bra0z64"
+VortexOfBot: password: "oauth:t7bfl2y4t5olizbo0usaywf9xfwn9n"

@@ -47,8 +47,6 @@ var greetings = [
     ],
     interMessagesCounter = 0,
     intervalMessages = [
-        "If you like whatcha see, follow! You can access my youtube here: https://www.youtube.com/channel/UC4XryR0fHLOlwCO4KLvn-ow",
-        "Stalk me here! https://twitter.com/MyKatEvolved"
     ],
     emotes = [
         "Kappa",
@@ -66,8 +64,8 @@ var greetings = [
     ],
     welcometext =
         "Welcome! chat messages should not be longer than 500 characters. " +
-        "Here's a list of the available commands: !about, !hello, !saymyname, !dicefules, !roll, !points, !testsafe.",
-    channelName = "katevolved",
+        "Here's a list of the available commands: !about, !hello, !saymyname, !dicerules, !roll, !points, !testsafe.",
+    channelName = "vortex_of_blades",
     commandCounter = 0,
     chatMaxLength = 500;
 
@@ -86,11 +84,11 @@ var options = {
         reconnect: true
     },
     identity: {
-        username: "KatEvoBot",
-        password: "oauth:vwohov7is1pou2rw9sylme9bra0z64"
+        username: "VortexOfBot",
+        password: "oauth:t7bfl2y4t5olizbo0usaywf9xfwn9n"
     },
     channels: [
-    "katevolved",
+    "vortex_of_blades",
     "minterhero"
     ]
 }
@@ -110,11 +108,6 @@ var Commands = {
         client.action(channel, "Until next time " + user['display-name'] + "! " + getRandomListItem(emotes) );
     },
 
-    '!rolltheminter': function (channel, user, message, self)
-    {
-        client.action(channel, user['display-name'] + " is the coolest person ever!");
-    },
-
     '!hi': function (channel, user, message, self)
     {
         client.action(channel, getRandomListItem(greetings) + " " + getRandomListItem(emotes));
@@ -129,15 +122,23 @@ var Commands = {
     {
         client.action(channel, "The dice has 100 sides, if you roll a 1 you are timed out. Your scores are saved by the bot.")
     },
+    '!why': function (channel, user, message, self)
+    {
+        client.action(channel, "You can do absolutely nothing with these points, this is just a fun command!")
+    },
 
     '!roll': function (channel, user, message, self)
     {
-        var diceResult = String(Math.floor(Math.random() * 100) + 1);
-        client.action(channel, user['display-name'] + ", you rolled " + diceResult + "!");
-        if (diceResult === 1)
-        {
-            client.timeout(channel, user['display-name'], 300, "Oh no, you rolled a 1! BibleThump")
+        var diceResult = Math.floor(Math.random() * 100) + 1;
+
+
+        if (diceResult === 1) {
+            client.timeout(channel, user['display-name'], 300, "rolled a 1")
+            client.action(channel, user['display-name'] + ", you rolled a 1! D:");
+        } else {
+            client.action(channel, user['display-name'] + ", you rolled " + diceResult + "!");
         }
+
         fs.appendFile('rollthediceStats.txt', user['display-name'] + " rolled " + diceResult + "\n");
     },
     '!points': function (channel, user, message, self)
@@ -169,14 +170,45 @@ var Commands = {
         {
             client.action(channel, "This command is for the admin only.");
         }
-    }
+    },
+
+    '!penta': function (channel, user, message, self){ 
+        if (user['display-name'] === "minterhero" || "vortex_of_blades"){
+
+        var diceResult = Math.floor(Math.random() * 1) + 1;
+            
+        client.action(channel, "vortex_of_blades got a penta!");
+        
+        fs.appendFile('killCounter.txt', "vortex_of_blades has " + diceResult + "\n" + " pentas.");
+        }
+    },
+    
+    '!pentas': function (channel, user, message, self)
+    {
+        var userStats, score = 0;
+        fs.readFile('killCounter.txt', 'utf-8', function (err, data)
+        {
+            if (err) console.log(err);
+            userStats = data.split('\n');
+            userStats.clean("");
+            userStats.forEach(function (stat)
+            {
+                if (stat.indexOf(user['vortex_of_blades']) >= 0)
+                {
+                    score += parseInt(stat.split(" ")[2]);
+                }
+            });
+            client.action(channel, "vortex_of_blades has  " + score + " penta(s) so far!");
+        });
+    },
 };
 
 client.on("resub", function (channel, username, months, message) {
-    client.action('Thank you ' + username + ' for subscribing!')
+    client.action(channel, 'Thank you ' + username + ' for subscribing!')
 });
+
 client.on("subscribers", function (channel, enabled) {
-    client.action('Thank you ' + username + ' for subscribing!')
+    client.action(channel, 'Thank you ' + username + ' for subscribing!')
 });
 
 // LIST COMMAND KEYS
@@ -204,7 +236,7 @@ client.on("chat", function (channel, user, message, self)
         // check if command exists
         if (Commands.hasOwnProperty(parsedCommand))
         {
-            // check if commands are sent too fast (counter starts at 0)
+
 
             // execute command
             Commands[parsedCommand](channel, user, message, self);
@@ -212,20 +244,7 @@ client.on("chat", function (channel, user, message, self)
     }
 });
 
-// display channel message every 10 minutes
-setInterval(function() {
-    client.action(channelName, intervalMessages[interMessagesCounter]);
-    if (interMessagesCounter < (intervalMessages.length - 1))
-    {
-        interMessagesCounter++;
-    } else {
-        interMessagesCounter = 0;
-    }
-}, 600000);
 
 // CONNECT BOT
 client.connect();
 
-client.on("connected", function(address, port) {
-    client.action("KatEvolved", "Bot connected!")
-})
